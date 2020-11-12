@@ -1,8 +1,6 @@
 package ex1;
 
-import java.awt.*;
 import java.util.*;
-import java.util.List;
 
 public class WGraph_DS implements weighted_graph{
 
@@ -14,7 +12,8 @@ public class WGraph_DS implements weighted_graph{
         private double tag;
 
         public Node() {
-            this.key = nodeSize() + 1;
+            int nodeSize = nodeSize();
+            this.key = nodeSize++;
             this.info = "Node " + key;
             this.tag = 0;
         }
@@ -139,11 +138,16 @@ public class WGraph_DS implements weighted_graph{
 
     @Override
     public void connect(int node1, int node2, double w) {
-        if (getNode(node1) != null && getNode(node2) != null && node1 != node2) {
-            graphEdges.get(getNode(node1)).put(node2, new Edge(getNode(node2), w));
-            graphEdges.get(getNode(node2)).put(node1, new Edge(getNode(node1), w));
-            edgeSize++;
-            countMC++;
+        node_info n1 = getNode(node1);
+        node_info n2 = getNode(node2);
+        if (n1 != null && n2 != null && node1 != node2) {
+            if (!hasEdge(node1, node2)) {
+                graphEdges.get(getNode(node1)).put(node2, new Edge(getNode(node2), w));
+                graphEdges.get(getNode(node2)).put(node1, new Edge(getNode(node1), w));
+                edgeSize++;
+                countMC++;
+                System.out.println(node1 + " -> " + node2 + ", weight = " + w);
+            }
         }
     }
 
@@ -174,6 +178,19 @@ public class WGraph_DS implements weighted_graph{
 
     @Override
     public node_info removeNode(int key) {
+
+        if(graphNodes.containsKey(key)) {
+            Iterator<node_info> itr = getV(key).iterator();
+
+            while(itr.hasNext()) removeEdge(key, itr.next().getKey());
+
+            node_info n = getNode(key);
+            graphEdges.remove(getNode(key)); //Remove from edge list.
+            graphNodes.remove(key); //Remove from nodes list.
+            nodeSize--;
+            countMC++;
+            return n;
+        }
         return null;
     }
 
@@ -182,7 +199,10 @@ public class WGraph_DS implements weighted_graph{
 
         if (hasEdge(node1, node2)) {
 
-            //Some logic executed here...
+            graphEdges.get(getNode(node1)).remove(node2);//Removing node1 -> node2
+            graphEdges.get(getNode(node2)).remove(node1);//Removing node2 -> node1
+            edgeSize--;
+            countMC++;
         }
 
     }
