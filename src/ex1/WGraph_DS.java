@@ -11,14 +11,12 @@ public class WGraph_DS implements weighted_graph {
         private int key;
         private String info;
         private double tag;
-        private HashMap<Integer, node_info> neighbors;
 
 
         public Node(int key) {
             this.key = key;
             this.info = "Node " + key;
             this.tag = 0;
-            neighbors = new HashMap<>();
         }
 
 
@@ -78,15 +76,16 @@ public class WGraph_DS implements weighted_graph {
 //        }
     }
 
+    public static final Graph_Comp _comp = new Graph_Comp();
     private HashMap<Integer, node_info> nodes;
     private HashMap<Integer, HashMap<Integer, Edge>> edges; //node_info = source node, Integer = destination key, Edge = the object representing neighborhood.
     private int nodeSize;
     private int edgeSize;
     private int countMC;
-//    public static Graph_Comp _comp = new Graph_Comp();
 
 
     public WGraph_DS() {
+//        this(new Graph_Comp());
         this.nodes = new HashMap<>();
         this.edges = new HashMap<>();
         this.nodeSize = 0;
@@ -137,7 +136,6 @@ public class WGraph_DS implements weighted_graph {
                 edges.get(node2).put(node1, new Edge(getNode(node1), w));
                 edgeSize++;
                 countMC++;
-                System.out.println("Connected: " + node1 + " -> " + node2 + ", weight = " + w);
             }
         }
     }
@@ -226,27 +224,12 @@ public class WGraph_DS implements weighted_graph {
                 ", \ncountMC=" + countMC +
                 '}';
     }
+
+    public Graph_Comp getComp() {
+        return _comp;
+    }
 }
 
-//class Pair {
-//    private node_info neighbor;
-//    private double weight;
-//
-//    public Pair(node_info neighbor, double weight) {
-//        if (neighbor != null && weight > 0) {
-//            this.neighbor = neighbor;
-//            this.weight = weight;
-//        }
-//    }
-//
-//    public node_info getNeighbor() {
-//        return this.neighbor;
-//    }
-//
-//    public double getWeight() {
-//        return this.weight;
-//    }
-//}
 
 abstract class Pair<L, R> {
     private L _leftObject;
@@ -309,24 +292,11 @@ class Graph_Comp implements Comparator<weighted_graph> {
     @Override
     public int compare(weighted_graph o1, weighted_graph o2) {
 
+        if(o1.nodeSize() < o2.nodeSize() || o1.nodeSize() > o2.nodeSize() || o1.edgeSize() < o2.edgeSize() || o1.edgeSize() > o2.edgeSize())
+            return -1;
+        else return 0;
 
-        if (o1.edgeSize() < o2.edgeSize() || o1.edgeSize() > o2.edgeSize()) return -1;
-        if (o2.nodeSize() <= o1.nodeSize()) {
-            for (node_info nodeFromO1 : o1.getV()) {
-                node_info nodeFromo2;
-                if (o2.getNode(nodeFromO1.getKey()) != null) {
-                    nodeFromo2 = o2.getNode(nodeFromO1.getKey());
 
-                    if (o2.getV(nodeFromo2.getKey()).size() == o1.getV(nodeFromO1.getKey()).size()) {
-                        for (node_info neighborO1 : o1.getV(nodeFromO1.getKey())) {
-                            if (!o2.hasEdge(nodeFromo2.getKey(), neighborO1.getKey())) return -1;
-                        }
-                    } else return -1;
-                } else return -1;
-
-            }
-        }
-        return 0;
     }
 }
 

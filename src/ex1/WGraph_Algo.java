@@ -2,6 +2,11 @@ package ex1;
 
 
 //import java-jason.*;
+
+import java.awt.geom.Line2D;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 
@@ -27,9 +32,12 @@ public class WGraph_Algo implements weighted_graph_algorithms {
             for (node_info node : g.getV()) //Iterate over each unvisited node and copy its connectivity component.
                 if (node.getTag() == 0) BFSCopy(node, newGraph);
 
+            System.out.println("init with graph: " + g);
             this.graph = newGraph;
-        } else
+        } else {
             this.graph = new WGraph_DS();
+            System.out.println("init new graph");
+        }
 
 
         resetTags(); //Using BFS so resetTags();
@@ -37,7 +45,7 @@ public class WGraph_Algo implements weighted_graph_algorithms {
 
     @Override
     public weighted_graph getGraph() {
-        return copy();
+        return this.graph;
     }
 
     @Override
@@ -49,7 +57,7 @@ public class WGraph_Algo implements weighted_graph_algorithms {
             if (node.getTag() == 0)
                 BFSCopy(graph.getNode(node.getKey()), g);
 
-
+        System.out.println("Finished copying");
         resetTags(); //Using BFS so resetTags();
 
         return g;
@@ -80,22 +88,20 @@ public class WGraph_Algo implements weighted_graph_algorithms {
 
                 for (node_info neighbor : this.graph.getV(curr.getKey())) {
 
-                    System.out.println("Visiting node: " + curr.getKey());
 
-                    if (!isVisited(neighbor, visited) && neighbor.getTag() == 0) {
+                    if ((!isVisited(neighbor, visited) && neighbor.getTag() == 0)) {
                         neighbor.setTag(1);
-                        System.out.println("\tVisiting neighbor: " + neighbor.getKey());
                         copyNodeToGraph(neighbor, copyTo);
                         q.add(neighbor);
+                        copyTo.connect(neighbor.getKey(), curr.getKey(), this.graph.getEdge(neighbor.getKey(), curr.getKey()));
+
+                    } else if ((graph.hasEdge(curr.getKey(), neighbor.getKey())) && !(copyTo.hasEdge(curr.getKey(), neighbor.getKey()))) {
                         copyTo.connect(neighbor.getKey(), curr.getKey(), this.graph.getEdge(neighbor.getKey(), curr.getKey()));
                     }
                 }
 
                 visited.add(start);
             }
-
-            System.out.println("Finished Copying Connectivity component from node: " + start.getKey());
-
         }
     }
 
@@ -103,9 +109,12 @@ public class WGraph_Algo implements weighted_graph_algorithms {
     public boolean isConnected() {
 
         node_info n = getFirstNode(this.graph);
+        if (graph.nodeSize() <= 1) return true;
+        if (n == null) return false;
 
         Queue<node_info> q = new LinkedList<>();
         q.add(n);
+
 
         while (!q.isEmpty()) {
 
@@ -122,10 +131,12 @@ public class WGraph_Algo implements weighted_graph_algorithms {
         for (node_info node : graph.getV())
             if (node.getTag() == 0) {
                 resetTags();
+                System.out.println("The graph is not connected");
                 return false;
             }
 
         resetTags();
+        System.out.println("The graph is connected");
         return true;
     }
 
@@ -152,10 +163,11 @@ public class WGraph_Algo implements weighted_graph_algorithms {
                 System.out.println("Edge from " + node.getKey() + " To " + next.getKey() + " With weight: " + graph.getEdge(node.getKey(), next.getKey()));
                 node = next;
             }
-            System.out.println(dist);
+            System.out.println("The shortest path from " + src + " to " + dest + " is " + dist + " long");
+
             return dist;
         }
-
+        System.out.println("The shortest path from " + src + " to " + dest + " does not exist!");
         return -1;
 
     }
@@ -172,7 +184,6 @@ public class WGraph_Algo implements weighted_graph_algorithms {
             HashMap<Integer, node_info> prevNode = new HashMap<>(); //A map of parent nodes. for (Integer) key, map (node_info) parent.
 
             PriorityQueue<node_info> pq = new PriorityQueue<>(graph.nodeSize(), new NodeComparator()); //The BFS queue
-            System.out.println(pq.comparator());
 
             boolean destinationFound = false;
 
@@ -182,8 +193,6 @@ public class WGraph_Algo implements weighted_graph_algorithms {
 
             node_info curr;
 
-
-            System.out.println("-------------Starting BFS...--------------");
             while (!pq.isEmpty()) {
 
                 curr = pq.poll();
@@ -197,11 +206,10 @@ public class WGraph_Algo implements weighted_graph_algorithms {
                         if (prevNode.containsKey(neighbor.getKey())) { // if this neighbor had a prev node, remove and put back.
                             prevNode.remove(neighbor.getKey());
                             prevNode.put(neighbor.getKey(), curr);
-                        } else {
+                        } else { // If node doesnt have a prev node already
                             prevNode.put(neighbor.getKey(), curr);
                         }
 
-                        System.out.println("Node: " + neighbor.getKey() + ", Tag: " + neighbor.getTag());
                         if (!pq.contains((node_info) neighbor)) pq.add(neighbor);
 
                     }//Finished processing an unvisited neighbor
@@ -211,19 +219,20 @@ public class WGraph_Algo implements weighted_graph_algorithms {
 
             }//Finished PriorityQueue operation
 
-            System.out.println("-------------Finished BFS...--------------");
-
-            for (node_info node : graph.getV()) {
-                System.out.println(node.getKey() + " Tag: " + node.getTag());
-            }
+//            for (node_info node : graph.getV()) {
+//                System.out.println(node.getKey() + " Tag: " + node.getTag());
+//            }
 
             //Rebuild path
 
             if (destinationFound) {
+                List<node_info> path = rebuildPath(src, dest, prevNode);
                 resetTags();
-                return rebuildPath(src, dest, prevNode);
+                return path;
             }
         }
+
+        System.out.println("One of the nodes is null, path does not exist");
         resetTags();
         return new LinkedList<>();
     }
@@ -231,6 +240,7 @@ public class WGraph_Algo implements weighted_graph_algorithms {
     /*
     NOT IMPLEMENTED YET!!!
      */
+
     /**
      * Rebuild a given path (Assuming there is one).
      * Extract from each given node it's previous calling node and add's it to the list.
@@ -245,17 +255,22 @@ public class WGraph_Algo implements weighted_graph_algorithms {
         if (prevNodes.isEmpty() || (to == from)) return new LinkedList<>();
 
         List<node_info> path = new LinkedList<>();
+        List<node_info> newPath = new LinkedList<>();
 
         node_info current = graph.getNode(to);
         path.add(current);
 
         while (!prevNodes.isEmpty() && current.getKey() != from) {
+
             path.add(prevNodes.get(current.getKey()));
             current = prevNodes.get(current.getKey()); //current = current.next();
         }
 
         Collections.reverse(path);
-        return path;
+        copyList(path, newPath);
+
+        System.out.println("Finished rebuilding path from " + from + " to " + to);
+        return new LinkedList<>(newPath);
     }
 
     /*
@@ -264,6 +279,7 @@ public class WGraph_Algo implements weighted_graph_algorithms {
     @Override
     public boolean save(String file) {
 
+        String path = "D:\\Users\\User\\Desktop\\";
 
         String nodeString = graph.getNode(0) + ": {\n\t";
 
@@ -273,13 +289,30 @@ public class WGraph_Algo implements weighted_graph_algorithms {
         for (node_info node : graph.getV()) {
 
             for (node_info neighbor : graph.getV(node.getKey())) {
-                edge += ("(" + (neighbor.getKey() + ", " + graph.getEdge(neighbor.getKey(), node.getKey()))+ " ), ") ;
-                if (i++ == graph.nodeSize() - 1) edge = edge.substring(0, edge.length()-2);
+                edge += ("(" + (neighbor.getKey() + ", " + graph.getEdge(neighbor.getKey(), node.getKey())) + " ), ");
+                if (i++ == graph.nodeSize() - 1) edge = edge.substring(0, edge.length() - 2);
             }
             edge += "\n";
         }
 
         System.out.println(nodeString + edge);
+
+        try {
+            File f = new File(path + file);
+            FileWriter c = new FileWriter(f);
+
+            System.out.println("Trying...");
+            c.write("Hello World!\n" + edge);
+
+            c.close();
+
+            return true;
+
+
+        } catch (IOException e) {
+            System.out.println("Failed");
+            e.printStackTrace();
+        }
 
 
         return false;
@@ -324,6 +357,7 @@ public class WGraph_Algo implements weighted_graph_algorithms {
 
     private void resetTags() {
         for (node_info n : graph.getV()) n.setTag(0);
+        System.out.println("Tags are reset to 0!");
     }
 
     private void setTagsInfinity() {
@@ -335,9 +369,24 @@ public class WGraph_Algo implements weighted_graph_algorithms {
         if (node != null && graph != null) {
             graph.addNode(node.getKey()); //Copy this new Node into the new graph.
             graph.getNode(node.getKey()).setInfo(node.getInfo());
+            graph.getNode(node.getKey()).setTag(node.getTag());
         }
     }
 
+    private void copyList(List<node_info> from, List<node_info> to) {
+
+        weighted_graph g = new WGraph_DS();
+
+
+        for (node_info node : from) {
+            copyNodeToGraph(node, g);
+        }
+
+
+        for (node_info node : g.getV()) {
+            to.add(node);
+        }
+    }
 
 
 }
