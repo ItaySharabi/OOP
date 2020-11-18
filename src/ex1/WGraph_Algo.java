@@ -1,18 +1,12 @@
 package ex1;
 
-
-//import java-jason.*;
-
-import java.awt.geom.Line2D;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 
 public class WGraph_Algo implements weighted_graph_algorithms {
 
-    weighted_graph graph;
+    weighted_graph graph; //The graph to operate on
 
 
     public WGraph_Algo() {
@@ -23,24 +17,30 @@ public class WGraph_Algo implements weighted_graph_algorithms {
         init(g);
     }
 
+    /**
+     * Instantiate this.graph with a shallow copy from a given weighted_graph object.
+     * @param g - given graph
+     */
     @Override
     public void init(weighted_graph g) {
-        if (g != null) {
-            weighted_graph newGraph = new WGraph_DS();
-            this.graph = g;
-
-            for (node_info node : g.getV()) //Iterate over each unvisited node and copy its connectivity component.
-                if (node.getTag() == 0) BFSCopy(node, newGraph);
-
-            System.out.println("init with graph: " + g);
-            this.graph = newGraph;
-        } else {
-            this.graph = new WGraph_DS();
-            System.out.println("init new graph");
-        }
-
-
-        resetTags(); //Using BFS so resetTags();
+        if (g != null) this.graph = g;
+//        if (g != null) {
+//            weighted_graph newGraph = new WGraph_DS();
+//            this.graph = g;
+//
+//            for (node_info node : g.getV()) //Iterate over each unvisited node and copy its connectivity component.
+//                if (node.getTag() == 0) BFSCopy(node, newGraph);
+//
+//            System.out.println("init with graph: " + g);
+//            resetTags(); //Using BFS on @Param g, reseting its tags.
+//            this.graph = newGraph;
+//        } else {
+//            this.graph = new WGraph_DS();
+//            System.out.println("init new graph");
+//        }
+//
+//
+//        resetTags(); //Using BFS so resetting tags.
     }
 
     @Override
@@ -55,10 +55,10 @@ public class WGraph_Algo implements weighted_graph_algorithms {
 
         for (node_info node : graph.getV())
             if (node.getTag() == 0)
-                BFSCopy(graph.getNode(node.getKey()), g);
+                BFSCopy(node, g);
 
         System.out.println("Finished copying");
-        resetTags(); //Using BFS so resetTags();
+        resetTags(); //Using BFS so resetting tags.
 
         return g;
     }
@@ -89,7 +89,7 @@ public class WGraph_Algo implements weighted_graph_algorithms {
                 for (node_info neighbor : this.graph.getV(curr.getKey())) {
 
 
-                    if ((!isVisited(neighbor, visited) && neighbor.getTag() == 0)) {
+                    if (!visited.contains(neighbor) && neighbor.getTag() == 0) {
                         neighbor.setTag(1);
                         copyNodeToGraph(neighbor, copyTo);
                         q.add(neighbor);
@@ -130,19 +130,16 @@ public class WGraph_Algo implements weighted_graph_algorithms {
 
         for (node_info node : graph.getV())
             if (node.getTag() == 0) {
-                resetTags();
                 System.out.println("The graph is not connected");
+                resetTags();
                 return false;
             }
 
-        resetTags();
         System.out.println("The graph is connected");
+        resetTags();
         return true;
     }
 
-    /*
-    NOT IMPLEMENTED YET!!!
-     */
     @Override
     public double shortestPathDist(int src, int dest) {
 
@@ -172,9 +169,6 @@ public class WGraph_Algo implements weighted_graph_algorithms {
 
     }
 
-    /*
-    NOT IMPLEMENTED YET!!!
-     */
     @Override
     public List<node_info> shortestPath(int src, int dest) {
 
@@ -206,6 +200,7 @@ public class WGraph_Algo implements weighted_graph_algorithms {
                         if (prevNode.containsKey(neighbor.getKey())) { // if this neighbor had a prev node, remove and put back.
                             prevNode.remove(neighbor.getKey());
                             prevNode.put(neighbor.getKey(), curr);
+
                         } else { // If node doesnt have a prev node already
                             prevNode.put(neighbor.getKey(), curr);
                         }
@@ -218,10 +213,6 @@ public class WGraph_Algo implements weighted_graph_algorithms {
                 visited.add(curr);
 
             }//Finished PriorityQueue operation
-
-//            for (node_info node : graph.getV()) {
-//                System.out.println(node.getKey() + " Tag: " + node.getTag());
-//            }
 
             //Rebuild path
 
@@ -236,10 +227,6 @@ public class WGraph_Algo implements weighted_graph_algorithms {
         resetTags();
         return new LinkedList<>();
     }
-
-    /*
-    NOT IMPLEMENTED YET!!!
-     */
 
     /**
      * Rebuild a given path (Assuming there is one).
@@ -273,64 +260,59 @@ public class WGraph_Algo implements weighted_graph_algorithms {
         return new LinkedList<>(newPath);
     }
 
-    /*
-    NOT IMPLEMENTED YET!!!
-     */
     @Override
     public boolean save(String file) {
 
         String path = "D:\\Users\\User\\Desktop\\";
 
-        String nodeString = graph.getNode(0) + ": {\n\t";
-
-        String edge = "";
-        int i = 0;
-
-        for (node_info node : graph.getV()) {
-
-            for (node_info neighbor : graph.getV(node.getKey())) {
-                edge += ("(" + (neighbor.getKey() + ", " + graph.getEdge(neighbor.getKey(), node.getKey())) + " ), ");
-                if (i++ == graph.nodeSize() - 1) edge = edge.substring(0, edge.length() - 2);
-            }
-            edge += "\n";
-        }
-
-        System.out.println(nodeString + edge);
-
         try {
-            File f = new File(path + file);
-            FileWriter c = new FileWriter(f);
 
-            System.out.println("Trying...");
-            c.write("Hello World!\n" + edge);
-
-            c.close();
-
+            FileOutputStream output = new FileOutputStream(file);
+            ObjectOutputStream oos = new ObjectOutputStream(output);
+            oos.writeObject(this.graph);
+            oos.flush();
+            oos.close();
             return true;
 
-
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         } catch (IOException e) {
-            System.out.println("Failed");
             e.printStackTrace();
         }
 
-
         return false;
     }
 
-    public static void writeJSONObject(String fileaName) {
-
-//        JSONObject nodes = new JSObject();
-    }
-
-    /*
-    NOT IMPLEMENTED YET!!!
+    /**
+     * https://github.com/simon-pikalov/Ariel_OOP_2020/blob/master/Classes/week_03/class3/src/class3/Points3D.java
      */
     @Override
     public boolean load(String file) {
+
+        String mainPath = "D:\\Users\\User\\Desktop\\";
+
+        try {
+            File f = new File(file);
+            FileInputStream input = new FileInputStream(f);
+            ObjectInputStream ois = new ObjectInputStream(input);
+
+            weighted_graph g = (weighted_graph) ois.readObject();
+
+            ois.close();
+            input.close();
+
+            return true;
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
         return false;
     }
-
 
     @Override
     public String toString() {
@@ -338,6 +320,7 @@ public class WGraph_Algo implements weighted_graph_algorithms {
                 "graph=" + graph +
                 '}';
     }
+
 
     private boolean isVisited(node_info node, List<node_info> visited) {
         return visited.contains((node_info) node);

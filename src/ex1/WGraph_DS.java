@@ -1,13 +1,12 @@
 package ex1;
 
+import java.io.Serializable;
 import java.util.*;
 
 
-public class WGraph_DS implements weighted_graph {
+public class WGraph_DS implements weighted_graph, Serializable {
 
-
-    private class Node implements node_info {
-
+    private class Node implements node_info, Serializable {
         private int key;
         private String info;
         private double tag;
@@ -54,29 +53,22 @@ public class WGraph_DS implements weighted_graph {
             this.tag = t;
         }
 
-        public void printNode() {
-            System.out.println("Node: " + this.key);
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Node node = (Node) o;
+            return key == node.key &&
+//                    Double.compare(node.tag, tag) == 0 &&
+                    Objects.equals(info, node.info);
         }
 
-//        /**
-//         * Compares 2 given nodes by tag value;
-//         * @param o1 first node.
-//         * @param o2 second node.
-//         * @returns a value greater than 0 if o1 > o2.
-//         *          a value lower than 0 if 01 < o2.
-//         *          0 if o1 == o2.
-//         *
-//         *          IF ONE OF THE NODES IS NULL RETURNS -INFINITY.
-//         */
-//        @Override
-//        public int compare(node_info o1, node_info o2) {
-//            if (o1 != null && o2 != null)
-//                return (int) (o1.getTag() - o2.getTag());
-//            return Integer.MIN_VALUE;
-//        }
+        @Override
+        public int hashCode() {
+            return Objects.hash(key, info, tag);
+        }
     }
 
-    public static final Graph_Comp _comp = new Graph_Comp();
     private HashMap<Integer, node_info> nodes;
     private HashMap<Integer, HashMap<Integer, Edge>> edges; //node_info = source node, Integer = destination key, Edge = the object representing neighborhood.
     private int nodeSize;
@@ -85,7 +77,6 @@ public class WGraph_DS implements weighted_graph {
 
 
     public WGraph_DS() {
-//        this(new Graph_Comp());
         this.nodes = new HashMap<>();
         this.edges = new HashMap<>();
         this.nodeSize = 0;
@@ -225,13 +216,26 @@ public class WGraph_DS implements weighted_graph {
                 '}';
     }
 
-    public Graph_Comp getComp() {
-        return _comp;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        WGraph_DS wGraph_ds = (WGraph_DS) o;
+        return nodeSize == wGraph_ds.nodeSize &&
+                edgeSize == wGraph_ds.edgeSize &&
+//                countMC == wGraph_ds.countMC &&
+                Objects.equals(nodes.size(), wGraph_ds.nodes.size()) &&
+                Objects.equals(edges.size(), wGraph_ds.edges.size());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(nodes, edges, nodeSize, edgeSize, countMC);
     }
 }
 
 
-abstract class Pair<L, R> {
+abstract class Pair<L, R> implements Serializable {
     private L _leftObject;
     private R _rightObject;
 
@@ -252,8 +256,7 @@ abstract class Pair<L, R> {
 
 }
 
-class Edge extends Pair {
-
+class Edge extends Pair implements Serializable {
     private node_info neighbor;
     private double weight;
 
@@ -273,30 +276,12 @@ class Edge extends Pair {
     }
 }
 
-class NodeComparator implements Comparator<node_info> {
+class NodeComparator implements Comparator<node_info>, Serializable {
     @Override
     public int compare(node_info o1, node_info o2) {
         return (int) (o1.getTag() - o2.getTag());
     }
 }
 
-class Graph_Comp implements Comparator<weighted_graph> {
 
-    /**
-     * Comparing graphs if the have the same set of nodes (by key) and the same set of edges.
-     *
-     * @param o1
-     * @param o2
-     * @return
-     */
-    @Override
-    public int compare(weighted_graph o1, weighted_graph o2) {
-
-        if(o1.nodeSize() < o2.nodeSize() || o1.nodeSize() > o2.nodeSize() || o1.edgeSize() < o2.edgeSize() || o1.edgeSize() > o2.edgeSize())
-            return -1;
-        else return 0;
-
-
-    }
-}
 
