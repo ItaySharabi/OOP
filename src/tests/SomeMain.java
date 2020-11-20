@@ -12,29 +12,6 @@ public class SomeMain {
 
     public static void main(String[] args) {
 
-
-        g = generateGraph(5, 4);
-        ga = new WGraph_Algo(g);
-
-
-        System.out.println(ga.shortestPathDist(0, 1));
-        System.out.println(ga.shortestPath(0, 1));
-
-//        weighted_graph g = ga.copy();
-        g.removeNode(1);
-        g.addNode(1);
-        g.connect(1, 0, 9);
-
-        ga.init(g);
-
-        System.out.println(ga.isConnected());
-
-        weighted_graph g1 = ga.copy();
-
-        System.out.println(g1);
-
-//        System.out.println(ga.shortestPathDist(0, 1));
-//        System.out.println(ga.shortestPath(0, 1));
     }
 
     public static weighted_graph generateGraph(int nodeSize, int edgeSize) {

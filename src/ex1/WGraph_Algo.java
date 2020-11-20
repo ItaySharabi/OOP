@@ -8,12 +8,15 @@ import java.util.*;
  * weighted, undirected graph data structure, that implements the weighted_graph interface.
  *
  * The algorithms I've implemented are Breadth first - based traversal algorithms,
- * which are implemented using a Queue structure.
+ * which are implemented using some Queue structure.
  * To find the shortest path, I've used a PriorityQueue to help speed things up.
  *
- * The algorithms in this class were all written by me exclusively, with some resources I've used such as:
- * @Dijkstra's shortest path idea: https://www.youtube.com/watch?v=pVfj6mxhdMw&t=561s
- * @Filewrite/read code: https://github.com/simon-pikalov/Ariel_OOP_2020/blob/master/Classes/week_03/class3/src/class3/Points3D.java
+ * Note: resetTags() method must be called any time a BFS algorithm is executed
+ * because it uses the node field: (double) tag, and changes it.
+ *
+ * Some resources that helped me implement some methods:
+ * @Dijkstra's shortest path: https://www.youtube.com/watch?v=pVfj6mxhdMw&t=561s
+ * @Filewrite/read: https://github.com/simon-pikalov/Ariel_OOP_2020/blob/master/Classes/week_03/class3/src/class3/Points3D.java
  */
 public class WGraph_Algo implements weighted_graph_algorithms {
 
@@ -34,7 +37,7 @@ public class WGraph_Algo implements weighted_graph_algorithms {
     }
 
     /**
-     * Instantiate this.graph with a shallow copy from a given weighted_graph object.
+     * Initiate this.graph with a shallow copy from a given weighted_graph object.
      * @Runtime: O(1), passing a pointer.
      * I've implemented this method before by deep copying the given graph g, and
      * then instantiate this.graph with the made copy.

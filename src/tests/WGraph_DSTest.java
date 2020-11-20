@@ -1,19 +1,49 @@
 package tests;
 
-import ex1.WGraph_DS;
-import ex1.weighted_graph;
+import ex1.*;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class WGraph_DSTest {
 
-    int _exceptionCount = 0;
+    weighted_graph g;
+    weighted_graph_algorithms ga;
+
+    /**
+     * This graph building method was taken from our OOP course github.
+     * Before each test, recreate this graph.
+     */
+    @BeforeEach
+    public void makeGraph() {
+        g = new WGraph_DS();
+        int v_size = 10, e_size = 10, seed = 10;
+
+
+        for(int i=0;i<v_size;i++)
+            g.addNode(i);
+
+        // Iterator<node_data> itr = V.iterator(); // Iterator is a more elegant and generic way, but KIS is more important
+        int[] nodes = nodes(g);
+        while(g.edgeSize() < e_size) {
+            double weight = Math.random()*seed;
+            int a = (int)(Math.random()*v_size);
+            int b = (int)(Math.random()*v_size);
+
+            int i = nodes[a];
+            int j = nodes[b];
+            g.connect(i,j, weight);
+        }
+        ga = new WGraph_Algo(g);
+    }
 
     @Test
     void getNode() {
-
-        weighted_graph g = createLinearGraph(10, 10);
 
         assertNotNull(g.getNode(0));
         g.removeNode(0);
@@ -34,7 +64,6 @@ class WGraph_DSTest {
 
     @Test
     void getEdge() {
-        weighted_graph g = createLinearGraph(10, 10);
 
         int node1 = (int) (Math.random() * 7) + 1;
         int node2 = (int) (Math.random() * 10) + 1;
@@ -58,8 +87,6 @@ class WGraph_DSTest {
     @Test
     void hasEdge() {
 
-        weighted_graph g = createLinearGraph(10, 10);
-
         int node1 = (int) (Math.random() * 7) + 1;
         int node2 = (int) (Math.random() * 10) + 1;
 
@@ -81,7 +108,6 @@ class WGraph_DSTest {
 
     @Test
     void removeNode() {
-        weighted_graph g = createLinearGraph(10, 10);
 
         int i = 0;
         int node1 = 0, node2 = 0;
@@ -104,51 +130,28 @@ class WGraph_DSTest {
 
 
 
-
         }
 
     }
 
-    public static weighted_graph createLinearGraph(int vertices, int _randomSeed) {
 
-        weighted_graph g = new WGraph_DS();
-
-        int i = 0;
-
-        while (i < vertices)
-            g.addNode(i++);
-
-        i = 0;
-        int _node1, _node2;
-
-        while (i < vertices - 1) {
-            double weight = 1; //(Math.random() * _randomSeed)
-
-            _node1 = i;
-            _node2 = ++i;
-
-            g.connect(_node1, _node2, weight);
-        }
-        return g;
-    }
-
-    public static weighted_graph myGraph() {
-
-        weighted_graph g = new WGraph_DS();
-
-        for (int i = 0; i < 10; i++)
-            g.addNode(i);
-
-        g.connect(1, 2, 1);
-        g.connect(2, 4, 1);
-        g.connect(3, 5, 1);
-        g.connect(4, 5, 1);
-        g.connect(4, 6, 1);
-        g.connect(6, 7, 1);
-        g.connect(6, 8, 1);
-        g.connect(8, 9, 1);
-        g.connect(0, 9, 1);
-
-        return g;
+    /**
+     * This method was take from our Github repository, from the tests package.
+     * @param g
+     * @returns a sorted array of the graph's nodes.
+     * @Runtime: Omega(n*log(n) + n) for sort operation. n = |V|.
+     */
+    private static int[] nodes(weighted_graph g) {
+        int size = g.nodeSize();
+        Collection<node_info> V = g.getV();
+        node_info[] nodes = new node_info[size];
+        V.toArray(nodes); // O(n) operation
+        int[] ans = new int[size];
+        for(int i=0;i<size;i++) {ans[i] = nodes[i].getKey();}
+        Arrays.sort(ans);
+        return ans;
     }
 }
+
+
+
