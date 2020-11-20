@@ -228,7 +228,7 @@ class WGraph_AlgoTest {
      * This method was take from our Github repository, from the tests package.
      * @param g
      * @returns a sorted array of the graph's nodes.
-     * @Runtime: Omega(n*log(n) + n) for sort operation. n = |V|.
+     * @Runtime: Omega(n*log(n) + n) = Omega(n*log(n)) for sort operation. n = |V|.
      */
     private static int[] nodes(weighted_graph g) {
         int size = g.nodeSize();

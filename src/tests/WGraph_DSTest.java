@@ -68,19 +68,26 @@ class WGraph_DSTest {
         int node1 = (int) (Math.random() * 7) + 1;
         int node2 = (int) (Math.random() * 10) + 1;
 
+        g.connect(node1, node2, 1);
+
         if (g.hasEdge(node1, node2)) {
             double weight = g.getEdge(node1, node2);
 
             System.out.println(node1 + ", " + node2);
             assertEquals(weight, g.getEdge(node1, node2));
+
             g.removeEdge(node1, node2);
             assertNotEquals(weight, g.getEdge(node1, node2));
             assertEquals(-1, g.getEdge(node1, node2));
+
             g.connect(node1, node2, weight);
-            assertEquals(weight, g.getEdge(node1, node2));
+            g.connect(node1, node2, weight+1);
+            assertEquals(weight+1, g.getEdge(node1, node2));
+
             g.removeEdge(node1, node2);
             g.connect(node1, node2, (Math.random() * 20) + 1);
             assertNotEquals(weight, g.getEdge(node1, node2));
+
         }
     }
 
@@ -112,24 +119,22 @@ class WGraph_DSTest {
         int i = 0;
         int node1 = 0, node2 = 0;
 
-        while(i < 100) {
+        while(i < 50) {
 
                 node1 = (int) (Math.random() * 10) + 1;
                 node2 = (int) (Math.random() * 10) + 1;
 
-            if (i++%2 == 0) {
+            if ((i++)%2 == 0) {
                 g.addNode(node1);
                 g.removeNode(node1);
-                assertNull(g.getNode(node1));
+                g.addNode(node1);
+                assertNotNull(g.getNode(node1));
             }
             else {
                 g.removeNode(node2);
                 g.removeNode(node2);
                 assertNull(g.getNode(node2));
             }
-
-
-
         }
 
     }

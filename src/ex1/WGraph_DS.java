@@ -110,6 +110,10 @@ public class WGraph_DS implements weighted_graph, Serializable {
         public double getWeight() {
             return this.weight;
         }
+
+        public void setWeight(double weight) {
+            this.weight = weight;
+        }
     }
 
     private HashMap<Integer, node_info> nodes; //A map of the nodes on this graph.
@@ -205,6 +209,12 @@ public class WGraph_DS implements weighted_graph, Serializable {
                 edgeSize++;
                 countMC++;
             }
+            else if(w > 0) {
+                edges.get(node1).get(node2).setWeight(w);
+                edges.get(node2).get(node1).setWeight(w);
+                edgeSize++;
+                countMC++;
+            }
         }
     }
 
@@ -218,7 +228,7 @@ public class WGraph_DS implements weighted_graph, Serializable {
 
     /**
      * @param node_id
-     * @return Collection. null if node_id is null, empty collection if no neighbors exist.
+     * @returns Collection. null if node_id is null, empty collection if no neighbors exist.
      * @Runtime: O(k), where k is a amount of neighbors of node_id.
      */
     @Override
@@ -342,11 +352,11 @@ public class WGraph_DS implements weighted_graph, Serializable {
 }
 
 /**
- * An abstract generic class I've created to help visualize pairs of objects.
+ * A generic class I've created to help visualize pairs of objects.
  * @param <L> - Any left object to initiate.
  * @param <R> - Any right object to initiate.
  */
-abstract class Pair<L, R> implements Serializable {
+class Pair<L, R> implements Serializable {
     private L _leftObject;
     private R _rightObject;
 
