@@ -286,7 +286,7 @@ public class WGraph_Algo implements weighted_graph_algorithms {
                             prevNode.put(neighbor.getKey(), curr);
                         }
 
-                        if (!pq.contains((node_info) neighbor)) pq.add(neighbor);
+                        if (!pq.contains(neighbor)) pq.add(neighbor);
 
                     }//Finished processing an unvisited neighbor
                 } //Finished Iterating over neighbors.
