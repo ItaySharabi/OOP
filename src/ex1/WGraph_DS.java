@@ -212,7 +212,6 @@ public class WGraph_DS implements weighted_graph, Serializable {
             else if(w > 0) {
                 edges.get(node1).get(node2).setWeight(w);
                 edges.get(node2).get(node1).setWeight(w);
-                edgeSize++;
                 countMC++;
             }
         }

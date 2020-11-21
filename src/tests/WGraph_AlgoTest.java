@@ -30,7 +30,7 @@ class WGraph_AlgoTest {
     public void makeGraph() {
 
         //Default graph will have 10 vertices and 10 edges.
-        int v_size = 10, e_size = 10, seed = 10;
+        int v_size = 10*500, e_size = 2*3000, seed = 10;
 
         g = graph_creator(v_size, e_size, seed);
 
@@ -83,7 +83,7 @@ class WGraph_AlgoTest {
 
         g1 = ga.copy(); //Deep copy g1 again
 
-        assertNotNull(6); //Make sure node 6 is not null
+        assertNull(g1.getNode(6)); //Make sure node 6 is not null
 
         g1.addNode(12);
 
@@ -97,8 +97,12 @@ class WGraph_AlgoTest {
 
     @Test
     void copy() {
-        weighted_graph g0 = graph_creator(3,3,1);
         weighted_graph_algorithms ag0 = new WGraph_Algo();
+        ag0.init(g);
+        weighted_graph g0 = ag0.copy();
+
+        assertTrue(g.equals(g0));
+
         ag0.init(g0);
         assertTrue(g0.equals(ag0.copy()));
     }
@@ -146,6 +150,9 @@ class WGraph_AlgoTest {
             assertEquals(n.getKey(), checkKey[i]);
             i++;
         }
+
+        weighted_graph_algorithms g = new WGraph_Algo(myGraph());
+        assertEquals(4.1, g.shortestPathDist(5,4));
     }
 
     @Test
@@ -239,5 +246,25 @@ class WGraph_AlgoTest {
         for(int i=0;i<size;i++) {ans[i] = nodes[i].getKey();}
         Arrays.sort(ans);
         return ans;
+    }
+
+    private weighted_graph myGraph() {
+        weighted_graph g = new WGraph_DS();
+        g.addNode(0);
+        g.addNode(1);
+        g.addNode(2);
+        g.addNode(3);
+        g.addNode(4);
+        g.addNode(5);
+
+        g.connect(0, 1, 1);
+        g.connect(2, 3, 1);
+        g.connect(0, 2, 1);
+        g.connect(1, 2, 1.1);
+        g.connect(1, 3, 10);
+        g.connect(1, 5, 1);
+        g.connect(3, 4, 1);
+
+        return g;
     }
 }

@@ -106,8 +106,15 @@ public class WGraph_Algo implements weighted_graph_algorithms {
     /**
      * As mentioned in copy(), this method traverses the graph breadth first,
      * inorder to copy it onto a new weighted_graph.
-     * If the graph contains more than k > 1 connectivity components than this methods needs to
+     * If the graph contains k > 1 connectivity components than this methods needs to
      * be executed k times.
+     *
+     * Logic: 1. Copy first node into the new graph, enqueue it, and mark it as visited.
+     *
+     *        Repeat: 2. Dequeue the next node from the queue
+     *                3. Iterate over the node's neighbor collection.
+     *                4.
+     *
      *
      * @Runtime: O(|V|+|E|).
      * @param start
@@ -118,8 +125,8 @@ public class WGraph_Algo implements weighted_graph_algorithms {
         if (start != null) {
 
             /*
-            My Data Structures are: List<node_info>, keeps track of visited nodes. If a nodes was now popped out
-            of the queue, add it the the visited nodes list.
+            My Data Structures are: List<node_info>, keeps track of visited nodes. If now finished
+            iterating over 'node' 's neighbors, add 'node' to the the visited nodes list. Regards the original graph nodes.
                                     Queue<node_info>, traversing the graph using a queue (Breadth First).
              */
             List<node_info> visited = new LinkedList<>();
@@ -128,7 +135,7 @@ public class WGraph_Algo implements weighted_graph_algorithms {
 
             q.add(start); //Add the first node to start traversing.
             copyNodeToGraph(start, copyTo); //Copy the start node into the graph to begin traversing.
-
+            start.setTag(1); // node is marked as copied into the new graph if node.getTag == 1.
 
             node_info curr = null;
 
@@ -140,12 +147,13 @@ public class WGraph_Algo implements weighted_graph_algorithms {
 
 
                     if (!visited.contains(neighbor) && neighbor.getTag() == 0) {
-                        neighbor.setTag(1);
-                        copyNodeToGraph(neighbor, copyTo);
-                        q.add(neighbor);
+                        copyNodeToGraph(neighbor, copyTo);// neighbor's tag == 0 so copy it into the new graph.
+                        neighbor.setTag(1); //neighbor was not copied yet so copy it.
+                        q.add(neighbor); // neighbor was not visited so enqueue it.
                         copyTo.connect(neighbor.getKey(), curr.getKey(), this.graph.getEdge(neighbor.getKey(), curr.getKey()));
+                        //Connect both neighbor and curr on the new graph with their original edge.
 
-                    } else if ((graph.hasEdge(curr.getKey(), neighbor.getKey())) && !(copyTo.hasEdge(curr.getKey(), neighbor.getKey()))) {
+                    } else if (!(copyTo.hasEdge(curr.getKey(), neighbor.getKey()))) {
                         copyTo.connect(neighbor.getKey(), curr.getKey(), this.graph.getEdge(neighbor.getKey(), curr.getKey()));
                     }
                 }
@@ -214,24 +222,9 @@ public class WGraph_Algo implements weighted_graph_algorithms {
 
         List<node_info> path = shortestPath(src, dest);
 
-        if (path.size() > 0) {
-            double dist = 0;
-            Iterator<node_info> itr = path.iterator();
+        if (path.size() > 0)
+            return path.get(path.indexOf(graph.getNode(dest))).getTag();
 
-
-            node_info node = itr.next(); //Start from the first node in the list.
-
-            while (itr.hasNext()) {
-                node_info next = itr.next(); //Mark the second node
-                dist += graph.getEdge(node.getKey(), next.getKey());
-                System.out.println("Edge from " + node.getKey() + " To " + next.getKey() + " With weight: " + graph.getEdge(node.getKey(), next.getKey()));
-                node = next;
-            }
-            System.out.println("The shortest path from " + src + " to " + dest + " is " + dist + " long");
-
-            return dist;
-        }
-        System.out.println("The shortest path from " + src + " to " + dest + " does not exist!");
         return -1;
 
     }
@@ -271,20 +264,26 @@ public class WGraph_Algo implements weighted_graph_algorithms {
             while (!pq.isEmpty()) {
 
                 curr = pq.poll();
+                System.out.println("Visiting through: " + curr.getKey());
 
                 for (node_info neighbor : graph.getV(curr.getKey())) {
-                    if (!isVisited(neighbor, visited)) {
+                    if (!visited.contains(neighbor)) {
+                        System.out.println("\tNeighbor: " + neighbor.getKey());
+
                         double totalDist = graph.getEdge(neighbor.getKey(), curr.getKey());
                         totalDist += curr.getTag();
-                        if (totalDist < neighbor.getTag()) //if the current total distance is less then the known distance:
+                        if (totalDist < neighbor.getTag()) {//if the current total distance is less then the known distance:
                             neighbor.setTag(totalDist);
-                        if (prevNode.containsKey(neighbor.getKey())) { // if this neighbor had a prev node, remove and put back.
-                            prevNode.remove(neighbor.getKey());
-                            prevNode.put(neighbor.getKey(), curr);
-
-                        } else { // If node doesn't have a prev node already
-                            prevNode.put(neighbor.getKey(), curr);
+                            updateCallingNode(prevNode, neighbor, curr);
+                            System.out.println("\tre-pointing from " + neighbor.getKey() + " to " + curr.getKey());
                         }
+//                        else if (prevNode.containsKey(neighbor.getKey())) { // if this neighbor had a prev node, remove and put back.
+//                            prevNode.remove(neighbor.getKey());
+//                            prevNode.put(neighbor.getKey(), curr);
+//                        }
+//                         else { // If node doesn't have a prev node already
+//                            prevNode.put(neighbor.getKey(), curr);
+//                        }
 
                         if (!pq.contains(neighbor)) pq.add(neighbor);
 
@@ -292,6 +291,7 @@ public class WGraph_Algo implements weighted_graph_algorithms {
                 } //Finished Iterating over neighbors.
                 if (curr.getKey() == dest) destinationFound = true;
                 visited.add(curr);
+                System.err.println(curr.getKey() + " is now set visited");
 
             }//Finished PriorityQueue operation
 
@@ -335,10 +335,8 @@ public class WGraph_Algo implements weighted_graph_algorithms {
             current = prevNodes.get(current.getKey()); //current = current.next();
         }
 
-        Collections.reverse(path);
         copyList(path, newPath);
 
-        System.out.println("Finished rebuilding path from " + from + " to " + to);
         return new LinkedList<>(newPath);
     }
 
@@ -415,9 +413,6 @@ public class WGraph_Algo implements weighted_graph_algorithms {
      * My private methods to help me organize the code.
      * Runtimes and explanations.
      */
-    private boolean isVisited(node_info node, List<node_info> visited) {
-        return visited.contains((node_info) node);
-    }
 
     /**
      * @Runtime: O(1);
@@ -431,6 +426,9 @@ public class WGraph_Algo implements weighted_graph_algorithms {
         return null;
     }
 
+    /**
+     * @Runtime: O(|V|). Reset each node's tag field to be 0.
+     */
     private void resetTags() {
         for (node_info n : graph.getV()) n.setTag(0);
         System.out.println("Tags are reset to 0!");
@@ -480,6 +478,19 @@ public class WGraph_Algo implements weighted_graph_algorithms {
         for (node_info node : g.getV()) {
             to.add(node);
         }
+    }
+
+    /**
+     * @Runtime: O(1), some constant finite operations.
+     * @param map - The data table to update.
+     * @param caller - the node who called its neighbor
+     * @param callee - the neighbor of the calling node
+     */
+    private void updateCallingNode(HashMap<Integer, node_info> map, node_info caller, node_info callee) {
+
+        if (map.containsKey(caller.getKey())) map.remove(caller.getKey());
+        map.put(caller.getKey(), callee);
+
     }
 
 
