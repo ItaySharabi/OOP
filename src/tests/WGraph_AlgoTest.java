@@ -16,11 +16,6 @@ class WGraph_AlgoTest {
     weighted_graph g;
     weighted_graph_algorithms ga;
 
-    @BeforeAll
-    static void set() {
-        System.out.println("WGraph_DS Test class: ");
-        System.out.println("--------------------- ");
-    }
 
     /**
      * This graph building method rebuilds the same graph before each test.
@@ -30,7 +25,7 @@ class WGraph_AlgoTest {
     public void makeGraph() {
 
         //Default graph will have 10 vertices and 10 edges.
-        int v_size = 10*500, e_size = 2*3000, seed = 10;
+        int v_size = (int)Math.pow(2, 16), e_size = v_size, seed = 40;
 
         g = graph_creator(v_size, e_size, seed);
 
@@ -81,15 +76,11 @@ class WGraph_AlgoTest {
 
         ga.init(g1); //Init ga with g1 (sending shallow pointer so far).
 
-        g1 = ga.copy(); //Deep copy g1 again
-
         assertNull(g1.getNode(6)); //Make sure node 6 is not null
 
         g1.addNode(12);
 
         ga.init(g1);
-
-        g1 = ga.copy();
 
         assertNotNull(g1.getNode(12));
         assertNull(g1.getNode(6));
@@ -99,7 +90,7 @@ class WGraph_AlgoTest {
     void copy() {
         weighted_graph_algorithms ag0 = new WGraph_Algo();
         ag0.init(g);
-        weighted_graph g0 = ag0.copy();
+        weighted_graph g0 = ag0.getGraph();
 
         assertTrue(g.equals(g0));
 
@@ -113,7 +104,7 @@ class WGraph_AlgoTest {
         weighted_graph_algorithms ag0 = new WGraph_Algo();
         ag0.init(g0);
         assertTrue(ag0.isConnected());
-        isConnected();
+
         double d = ag0.shortestPathDist(0,10);
         assertEquals(5.1, d);
 
@@ -123,17 +114,16 @@ class WGraph_AlgoTest {
         g.addNode(62);
         g.addNode(63);
 
-        assertEquals(-1, ga.shortestPathDist(50, 63));
 
         g.connect(50, 60, 100);
         g.connect(60, 61, 100);
         g.connect(61, 62, 100);
-        g.connect(50, 62, 100);
-        g.connect(62, 63, 1);
+        g.connect(50, 62, 0.1);
+        g.connect(62, 63, 0.1);
 
         ga.init(g);
 
-        assertEquals(101.0, ga.shortestPathDist(50, 63), 0.01);
+        assertEquals(0.2, ga.shortestPathDist(50, 63), 0.1);
     }
 
     @Test
@@ -151,8 +141,13 @@ class WGraph_AlgoTest {
             i++;
         }
 
-        weighted_graph_algorithms g = new WGraph_Algo(myGraph());
-        assertEquals(4.1, g.shortestPathDist(5,4));
+        weighted_graph_algorithms ga = new WGraph_Algo(myGraph());
+        assertEquals(4.1, ga.shortestPathDist(5,4));
+
+        weighted_graph g = ga.copy();
+        g.removeNode(3);
+        ga.init(g);
+        assertEquals(-1, ga.shortestPathDist(5, 4));
     }
 
     @Test

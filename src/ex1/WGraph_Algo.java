@@ -15,6 +15,7 @@ import java.util.*;
  * because it uses the node field: (double) tag, and changes it.
  *
  * Some resources that helped me implement some methods:
+ *
  * @Dijkstra's shortest path: https://www.youtube.com/watch?v=pVfj6mxhdMw&t=561s
  * @Filewrite/read: https://github.com/simon-pikalov/Ariel_OOP_2020/blob/master/Classes/week_03/class3/src/class3/Points3D.java
  */
@@ -30,6 +31,7 @@ public class WGraph_Algo implements weighted_graph_algorithms {
     /**
      * Initiate this graph with 'g'.
      * Calling init(weighted_graph g).
+     *
      * @param g - The new graph to work on.
      */
     public WGraph_Algo(weighted_graph g) {
@@ -38,37 +40,13 @@ public class WGraph_Algo implements weighted_graph_algorithms {
 
     /**
      * Initiate this.graph with a shallow copy from a given weighted_graph object.
-     * @Runtime: O(1), passing a pointer.
-     * I've implemented this method before by deep copying the given graph g, and
-     * then instantiate this.graph with the made copy.
      *
-     * Pros: 1. Encapsulation: The given graph g will not be corrupted from within this class.
-     *
-     * Cons: 1. That was not asked.
-     *       2. I can potentially corrupt the given graph g.
-     *       3. Runtime: O(|V|+|E|)
      * @param g - given graph
+     * @Runtime: O(1), passing a pointer.
      */
     @Override
     public void init(weighted_graph g) {
         if (g != null) this.graph = g;
-//        if (g != null) {
-//            weighted_graph newGraph = new WGraph_DS();
-//            this.graph = g;
-//
-//            for (node_info node : g.getV()) //Iterate over each unvisited node and copy its connectivity component.
-//                if (node.getTag() == 0) BFSCopy(node, newGraph);
-//
-//            System.out.println("init with graph: " + g);
-//            resetTags(); //Using BFS on @Param g, reseting its tags.
-//            this.graph = newGraph;
-//        } else {
-//            this.graph = new WGraph_DS();
-//            System.out.println("init new graph");
-//        }
-//
-//
-//        resetTags(); //Using BFS so resetting tags.
     }
 
     /**
@@ -85,7 +63,7 @@ public class WGraph_Algo implements weighted_graph_algorithms {
      * which traverses a given connectivity component starting from node 'start',
      * and the main method copy() executes this BFS algo on every connectivity component on this.graph.
      *
-     * @Runtime: O(|V|+|E|)
+     * @Runtime: O(| V | + | E |)
      * @returns a deep copy of this.graph.
      */
     @Override
@@ -97,7 +75,7 @@ public class WGraph_Algo implements weighted_graph_algorithms {
             if (node.getTag() == 0)
                 BFSCopy(node, g);
 
-        System.out.println("Finished copying");
+//        System.out.println("Finished copying");
         resetTags(); //Using BFS so resetting tags.
 
         return g;
@@ -108,17 +86,16 @@ public class WGraph_Algo implements weighted_graph_algorithms {
      * inorder to copy it onto a new weighted_graph.
      * If the graph contains k > 1 connectivity components than this methods needs to
      * be executed k times.
-     *
+     * <p>
      * Logic: 1. Copy first node into the new graph, enqueue it, and mark it as visited.
+     * <p>
+     * Repeat: 2. Dequeue the next node from the queue
+     * 3. Iterate over the node's neighbor collection.
+     * 4.
      *
-     *        Repeat: 2. Dequeue the next node from the queue
-     *                3. Iterate over the node's neighbor collection.
-     *                4.
-     *
-     *
-     * @Runtime: O(|V|+|E|).
      * @param start
      * @param copyTo
+     * @Runtime: O(| V | + | E |).
      */
     public void BFSCopy(node_info start, weighted_graph copyTo) {
 
@@ -145,7 +122,6 @@ public class WGraph_Algo implements weighted_graph_algorithms {
 
                 for (node_info neighbor : this.graph.getV(curr.getKey())) {
 
-
                     if (!visited.contains(neighbor) && neighbor.getTag() == 0) {
                         copyNodeToGraph(neighbor, copyTo);// neighbor's tag == 0 so copy it into the new graph.
                         neighbor.setTag(1); //neighbor was not copied yet so copy it.
@@ -166,9 +142,10 @@ public class WGraph_Algo implements weighted_graph_algorithms {
     /**
      * Traversing the graph Breath first, from the first node returned from the graph,
      * to check if the graph is connected.
+     *
      * @returns True iff there is a path from some node to any other node in the graph.
-     *          Note: A graph with 0 or 1 vertex is connected, a null graph is not connected.
-     * @Runtime: O(|V|+|E|).
+     * Note: A graph with 0 or 1 vertex is connected, a null graph is not connected.
+     * @Runtime: O(| V | + | E |).
      */
     @Override
     public boolean isConnected() {
@@ -208,21 +185,21 @@ public class WGraph_Algo implements weighted_graph_algorithms {
     /**
      * Calculates the distance (by weight) from node src to node dest.
      * This method relies on shortestPath(int src, int dest) by calling it and getting the specific path
-     * and then adding together the total distance.
+     * and then returning the destination node's tag with getTag(). That represents the distance between src and dest.
      *
-     * @Runtime: O((|V|+|E|) + k), where k is the number of nodes on the path.
-     * @param src - start node
+     * @param src  - start node
      * @param dest - end (target) node
      * @return the distance (double) by weight.
+     * @Runtime: O(( | V | + | E |) + k), where k is the number of nodes on the path.
      */
     @Override
     public double shortestPathDist(int src, int dest) {
 
         if (src == dest) return 0;
 
-        List<node_info> path = shortestPath(src, dest);
+        List<node_info> path = shortestPath(src, dest); //Execute Dijkstra's from src to dest
 
-        if (path.size() > 0)
+        if (path.size() > 0) //If path exists, it's size is greater than 0. return the tag of dest node.
             return path.get(path.indexOf(graph.getNode(dest))).getTag();
 
         return -1;
@@ -238,9 +215,9 @@ public class WGraph_Algo implements weighted_graph_algorithms {
      * 2. A HashMap<Integer, node_info> (prevNode) to keep track of which vertex called which neighbor with a shorter path.
      * 3. A List<node_info> (path) to save the shortest path from src to dest. (rebuildPath() method does that).
      *
-     * @Runtime: O(|V|+|E|)
-     * @param src - start node
+     * @param src  - start node
      * @param dest - end (target) node
+     * @Runtime: O(| V | + | E |)
      * @returns a List<node_info> that contains all nodes on the shortest path from src to dest.
      */
     @Override
@@ -264,39 +241,26 @@ public class WGraph_Algo implements weighted_graph_algorithms {
             while (!pq.isEmpty()) {
 
                 curr = pq.poll();
-                System.out.println("Visiting through: " + curr.getKey());
 
                 for (node_info neighbor : graph.getV(curr.getKey())) {
                     if (!visited.contains(neighbor)) {
-                        System.out.println("\tNeighbor: " + neighbor.getKey());
 
                         double totalDist = graph.getEdge(neighbor.getKey(), curr.getKey());
                         totalDist += curr.getTag();
                         if (totalDist < neighbor.getTag()) {//if the current total distance is less then the known distance:
                             neighbor.setTag(totalDist);
                             updateCallingNode(prevNode, neighbor, curr);
-                            System.out.println("\tre-pointing from " + neighbor.getKey() + " to " + curr.getKey());
                         }
-//                        else if (prevNode.containsKey(neighbor.getKey())) { // if this neighbor had a prev node, remove and put back.
-//                            prevNode.remove(neighbor.getKey());
-//                            prevNode.put(neighbor.getKey(), curr);
-//                        }
-//                         else { // If node doesn't have a prev node already
-//                            prevNode.put(neighbor.getKey(), curr);
-//                        }
-
                         if (!pq.contains(neighbor)) pq.add(neighbor);
 
                     }//Finished processing an unvisited neighbor
                 } //Finished Iterating over neighbors.
                 if (curr.getKey() == dest) destinationFound = true;
                 visited.add(curr);
-                System.err.println(curr.getKey() + " is now set visited");
 
             }//Finished PriorityQueue operation
 
             //Rebuild path
-
             if (destinationFound) {
                 List<node_info> path = rebuildPath(src, dest, prevNode);
                 resetTags();
@@ -313,10 +277,10 @@ public class WGraph_Algo implements weighted_graph_algorithms {
      * Rebuild a given path (Assuming there is one).
      * Extract from each given node it's previous calling node and add it to the list.
      *
-     * @Runtime: O(k), where k is the number of nodes on the path.
      * @param from
      * @param to
      * @param prevNodes
+     * @Runtime: O(k), where k is the number of nodes on the path.
      * @returns a list with all rellevant nodes.
      */
     private List<node_info> rebuildPath(int from, int to, HashMap<Integer, node_info> prevNodes) {
@@ -416,7 +380,6 @@ public class WGraph_Algo implements weighted_graph_algorithms {
 
     /**
      * @Runtime: O(1);
-     *
      * @returns the first node to appear in graph.getV() Collection of nodes.
      */
     private node_info getFirstNode(weighted_graph graph) {
@@ -427,7 +390,7 @@ public class WGraph_Algo implements weighted_graph_algorithms {
     }
 
     /**
-     * @Runtime: O(|V|). Reset each node's tag field to be 0.
+     * @Runtime: O(| V |). Reset each node's tag field to be 0.
      */
     private void resetTags() {
         for (node_info n : graph.getV()) n.setTag(0);
@@ -435,7 +398,7 @@ public class WGraph_Algo implements weighted_graph_algorithms {
     }
 
     /**
-     * @Runtime: O(|V|)
+     * @Runtime: O(| V |)
      * This methods sets all of the node's tags to INFINITY.
      */
     private void setTagsInfinity() {
@@ -444,10 +407,10 @@ public class WGraph_Algo implements weighted_graph_algorithms {
     }
 
     /**
-     * @Runtime: O(1)
-     * This method copies a given node to a given graph.
      * @param node
      * @param graph
+     * @Runtime: O(1)
+     * This method copies a given node to a given graph.
      */
     private void copyNodeToGraph(node_info node, weighted_graph graph) {
         if (node != null && graph != null) {
@@ -458,12 +421,12 @@ public class WGraph_Algo implements weighted_graph_algorithms {
     }
 
     /**
+     * @param from
+     * @param to
      * @Runtime: O(k + k) = O(k), where k is the number of nodes in the original list.
      * This method helped me retrieve the node's tags after using the CopyBFS() method.
      * Generates a new empty graph and copies all given nodes from the original list to the graph,
      * then extract all of the graph nodes into the new list.
-     * @param from
-     * @param to
      */
     private void copyList(List<node_info> from, List<node_info> to) {
 
@@ -481,10 +444,10 @@ public class WGraph_Algo implements weighted_graph_algorithms {
     }
 
     /**
-     * @Runtime: O(1), some constant finite operations.
-     * @param map - The data table to update.
+     * @param map    - The data table to update.
      * @param caller - the node who called its neighbor
      * @param callee - the neighbor of the calling node
+     * @Runtime: O(1), some constant finite operations.
      */
     private void updateCallingNode(HashMap<Integer, node_info> map, node_info caller, node_info callee) {
 
