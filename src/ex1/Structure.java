@@ -4,15 +4,15 @@ import java.io.File;
 
 public class Structure {
 
-    private static String[] _dirs = {"ex1/src", "ex1/tests", "README.md"};
+    private static String[] _dirs = {"src", "tests", "README.md"};
     private static String[] _files = {"node_info.java", "weighted_graph.java",
             "weighted_graph_algorithms.java", "WGraph_Algo.java", "WGraph_DS.java"};
     private static String _log = "";
 
     public static void main(String[] a) {
         String _log = "";
-        String folder_path = System.getProperty("user.dir")+"\\ex1.src\\ex1\\";
-        String src_file = folder_path+"ex1.src\\";
+        String folder_path = System.getProperty("user.dir")+"\\src\\ex1\\";
+        String src_file = folder_path+"src\\";
         boolean b0 = testFolders(folder_path);
         boolean b1 =testFiles(src_file);
         System.out.println("Report: Folders: "+b0+"  Files: "+b1);
