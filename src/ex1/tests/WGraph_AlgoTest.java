@@ -86,7 +86,7 @@ class WGraph_AlgoTest {
     }
 
     @Test
-    void copy() {
+    void copyAndGetGraph() {
         weighted_graph_algorithms ag0 = new WGraph_Algo();
         ag0.init(g);
         weighted_graph g0 = ag0.getGraph();
@@ -107,6 +107,11 @@ class WGraph_AlgoTest {
         double d = ag0.shortestPathDist(0,10);
         assertEquals(5.1, d);
 
+        g.removeNode(50);
+        g.removeNode(60);
+        g.removeNode(61);
+        g.removeNode(62);
+        g.removeNode(63);
         g.addNode(50);
         g.addNode(60);
         g.addNode(61);
@@ -143,7 +148,7 @@ class WGraph_AlgoTest {
         weighted_graph_algorithms ga = new WGraph_Algo(myGraph());
         assertEquals(4.1, ga.shortestPathDist(5,4));
 
-        weighted_graph g = ga.copy();
+        g = ga.copy();
         g.removeNode(3);
         ga.init(g);
         assertEquals(-1, ga.shortestPathDist(5, 4));
