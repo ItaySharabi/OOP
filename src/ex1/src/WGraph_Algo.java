@@ -61,7 +61,7 @@ public class WGraph_Algo implements weighted_graph_algorithms {
      * Creates a deep copy of this.graph into a new weighted_graph.
      * I've implemented a BFSCopy(node_info start, weighted_graph copyTo) method,
      * which traverses a given connectivity component starting from node 'start',
-     * and the main method copy() executes this BFS algo on every connectivity component on this.graph.
+     * and the main method copy() executes this BFS algorithm on every connectivity component on this.graph.
      *
      * @Runtime: O(| V | + | E |)
      * @returns a deep copy of this.graph.
@@ -268,7 +268,6 @@ public class WGraph_Algo implements weighted_graph_algorithms {
             }
         }
 
-        System.out.println("One of the nodes is null, path does not exist");
         resetTags();
         return new LinkedList<>();
     }
@@ -348,6 +347,7 @@ public class WGraph_Algo implements weighted_graph_algorithms {
             ObjectInputStream ois = new ObjectInputStream(input);
 
             weighted_graph g = (weighted_graph) ois.readObject();
+            init(g);
 
             ois.close();
             input.close();
@@ -394,7 +394,6 @@ public class WGraph_Algo implements weighted_graph_algorithms {
      */
     private void resetTags() {
         for (node_info n : graph.getV()) n.setTag(0);
-        System.out.println("Tags are reset to 0!");
     }
 
     /**

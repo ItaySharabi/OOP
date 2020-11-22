@@ -24,7 +24,7 @@ class WGraph_AlgoTest {
     public void makeGraph() {
 
         //Default graph will have 10 vertices and 10 edges.
-        int v_size = (int)Math.pow(2, 16), e_size = v_size, seed = 40;
+        int v_size = (int)Math.pow(2, 12), e_size = v_size, seed = 40;
 
         g = graph_creator(v_size, e_size, seed);
 
