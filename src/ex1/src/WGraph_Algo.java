@@ -1,4 +1,4 @@
-package ex1;
+package ex1.src;
 
 import java.io.*;
 import java.util.*;
@@ -17,7 +17,7 @@ import java.util.*;
  * Some resources that helped me implement some methods:
  *
  * @Dijkstra's shortest path: https://www.youtube.com/watch?v=pVfj6mxhdMw&t=561s
- * @Filewrite/read: https://github.com/simon-pikalov/Ariel_OOP_2020/blob/master/Classes/week_03/class3/src/class3/Points3D.java
+ * @Filewrite/read: https://github.com/simon-pikalov/Ariel_OOP_2020/blob/master/Classes/week_03/class3/ex1.src/class3/Points3D.java
  */
 public class WGraph_Algo implements weighted_graph_algorithms {
 
@@ -183,9 +183,9 @@ public class WGraph_Algo implements weighted_graph_algorithms {
     }
 
     /**
-     * Calculates the distance (by weight) from node src to node dest.
-     * This method relies on shortestPath(int src, int dest) by calling it and getting the specific path
-     * and then returning the destination node's tag with getTag(). That represents the distance between src and dest.
+     * Calculates the distance (by weight) from node ex1.src to node dest.
+     * This method relies on shortestPath(int ex1.src, int dest) by calling it and getting the specific path
+     * and then returning the destination node's tag with getTag(). That represents the distance between ex1.src and dest.
      *
      * @param src  - start node
      * @param dest - end (target) node
@@ -197,7 +197,7 @@ public class WGraph_Algo implements weighted_graph_algorithms {
 
         if (src == dest) return 0;
 
-        List<node_info> path = shortestPath(src, dest); //Execute Dijkstra's from src to dest
+        List<node_info> path = shortestPath(src, dest); //Execute Dijkstra's from ex1.src to dest
 
         if (path.size() > 0) //If path exists, it's size is greater than 0. return the tag of dest node.
             return path.get(path.indexOf(graph.getNode(dest))).getTag();
@@ -209,16 +209,16 @@ public class WGraph_Algo implements weighted_graph_algorithms {
     /**
      * This method is my favorite!
      * Traversing the graph Breadth first using a PriorityQueue to search for the shortest path
-     * from node src to node dest.
+     * from node ex1.src to node dest.
      * Data structures I've used to implement:
      * 1. A List<node_info> (visited) to keep track of visited nodes,
      * 2. A HashMap<Integer, node_info> (prevNode) to keep track of which vertex called which neighbor with a shorter path.
-     * 3. A List<node_info> (path) to save the shortest path from src to dest. (rebuildPath() method does that).
+     * 3. A List<node_info> (path) to save the shortest path from ex1.src to dest. (rebuildPath() method does that).
      *
      * @param src  - start node
      * @param dest - end (target) node
      * @Runtime: O(| V | + | E |)
-     * @returns a List<node_info> that contains all nodes on the shortest path from src to dest.
+     * @returns a List<node_info> that contains all nodes on the shortest path from ex1.src to dest.
      */
     @Override
     public List<node_info> shortestPath(int src, int dest) {

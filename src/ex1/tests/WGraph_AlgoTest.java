@@ -1,9 +1,8 @@
-package tests;
+package ex1.tests;
 
-import ex1.*;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ex1.src.*;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -198,7 +197,7 @@ class WGraph_AlgoTest {
     }
 
     /**
-     * This method was taken from our Github repository, from the tests package.
+     * This method was taken from our Github repository, from the ex1.tests package.
      * This method creates and returns an weighted, undirected graph of size v_size,
      * with e_size edges, each one with a random number by seed
      * @param v_size - vertices number
@@ -227,7 +226,7 @@ class WGraph_AlgoTest {
     }
 
     /**
-     * This method was take from our Github repository, from the tests package.
+     * This method was take from our Github repository, from the ex1.tests package.
      * @param g
      * @returns a sorted array of the graph's nodes.
      * @Runtime: Omega(n*log(n) + n) = Omega(n*log(n)) for sort operation. n = |V|.
