@@ -9,7 +9,4 @@ graph is connected (Also could have calculated # of connectivity components) and
 
 My implementation was more Breadth-First based, therefore all of the algorithms 
 are implemented with some Queue data structure.
-
-
-
-
+ 
